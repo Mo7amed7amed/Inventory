@@ -1,11 +1,15 @@
 package com.example.mohamed.inventory;
 
+import android.app.LoaderManager;
+import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,30 +17,34 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
-ProductAdapter adapter;
-ListView listView;
+import com.example.mohamed.inventory.ProductContract.ProductEntry;
+
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+    private static final int PRODUCT_LOADER = 0;
+    ProductAdapter mCursorAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Cursor cursor = getContentResolver().query(ProductContract.ProductEntry.CONTENT_URI, null, null, null, null);
-        adapter = new ProductAdapter(this, cursor);
-        listView = (ListView) findViewById(R.id.list);
-        listView.setAdapter(adapter);
-        View view = findViewById(R.id.empty_text);
-        listView.setEmptyView(view);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        ListView productListView = (ListView) findViewById(R.id.list_view_product);
+
+        View emptyView = findViewById(R.id.empty_view);
+        productListView.setEmptyView(emptyView);
+        mCursorAdapter = new ProductAdapter(this, null);
+        productListView.setAdapter(mCursorAdapter);
+        productListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, final long id) {
-
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Intent intent = new Intent(MainActivity.this, ProductDetailActivity.class);
-                intent.setData(Uri.withAppendedPath(ProductContract.ProductEntry.CONTENT_URI, String.valueOf(adapter.getItemId(position))));
-
+                Uri currentPetUri = ContentUris.withAppendedId(ProductEntry.CONTENT_URI, id);
+                intent.setData(currentPetUri);
                 startActivity(intent);
             }
         });
+        getLoaderManager().initLoader(PRODUCT_LOADER, null, this);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -61,7 +69,7 @@ ListView listView;
         View parentRow = (View) view.getParent();
         ListView listView = (ListView) parentRow.getParent();
         final int position = listView.getPositionForView(parentRow);
-        long id = adapter.getItemId(position);
+        long id = mCursorAdapter.getItemId(position);
         Cursor c = getContentResolver().query(Uri.withAppendedPath(ProductContract.ProductEntry.CONTENT_URI, String.valueOf(id)), null, null, null, null);
         if (c.moveToFirst()) {
             String name = c.getString(c.getColumnIndex(ProductContract.ProductEntry.COULMN_NAME));
@@ -80,6 +88,35 @@ ListView listView;
                 values.put(ProductContract.ProductEntry.COULMN_IMAGE, iUri);
                 getContentResolver().update(Uri.withAppendedPath(ProductContract.ProductEntry.CONTENT_URI, String.valueOf(id)), values, null, null);
             }
+
         }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] projection = {
+                ProductEntry._ID,
+                ProductEntry.COULMN_NAME,
+                ProductEntry.COULMN_PRICE,
+                ProductEntry.COULMN_QUANTITY,
+                ProductEntry.COULMN_IMAGE};
+
+        return new CursorLoader(this,
+                ProductEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mCursorAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mCursorAdapter.swapCursor(null);
     }
 }

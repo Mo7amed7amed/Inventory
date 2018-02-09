@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.mohamed.inventory.AddProductActivity">
+
     <LinearLayout
         android:id="@+id/activity_add"
         android:layout_width="match_parent"
@@ -19,33 +20,32 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Product name:" />
+                android:text="@string/product_name" />
 
             <EditText
                 android:id="@+id/edit_name"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:hint="enter name " />
+                android:hint="@string/enter_name" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
             android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Product Price:" />
+                android:text="@string/product_price" />
 
             <EditText
                 android:id="@+id/edit_price"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:hint="enter price " />
+                android:hint="@string/enter_price" />
         </LinearLayout>
 
         <LinearLayout
@@ -56,15 +56,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Product quantity:" />
+                android:text="@string/product_quantity" />
 
             <EditText
                 android:id="@+id/edit_quantity"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-
-                android:hint="enter quantity " />
+                android:hint="@string/enter_quantity" />
         </LinearLayout>
 
         <LinearLayout
@@ -75,8 +74,10 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
                 android:onClick="takePhoto"
-                android:text="choose an image" />
+                android:background="@drawable/button_shape_b"
+                android:text="@string/choose_an_image" />
 
             <ImageView
                 android:id="@+id/edit_image"
@@ -84,14 +85,14 @@
                 android:layout_height="100dp"
                 android:layout_marginLeft="10dp"
                 tools:src="@mipmap/ic_launcher" />
-
         </LinearLayout>
 
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/button_shape_b"
             android:layout_margin="5dp"
             android:onClick="save"
-            android:text="save" />
+            android:text="@string/save" />
     </LinearLayout>
 </ScrollView>

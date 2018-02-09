@@ -6,18 +6,25 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.view.Menu;
+
+import java.io.FileDescriptor;
+import java.io.IOException;
 
 public class ProductDetailActivity extends AppCompatActivity {
     private Uri uri;
@@ -25,6 +32,8 @@ public class ProductDetailActivity extends AppCompatActivity {
     private int price;
     private int quantity;
     private String iUri;
+    private static final String TAG = "ProductDetails";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,19 +43,24 @@ public class ProductDetailActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(ProductDetailActivity.this,
                 new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
     }
+
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case 1: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     show(uri);
+
                 } else {
+
+
                     Toast.makeText(ProductDetailActivity.this, "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
                 }
                 return;
             }
         }
     }
+
     private void show(Uri uri) {
         Cursor c = getContentResolver().query(uri, null, null, null, null);
         TextView tname = (TextView) findViewById(R.id.dname);
@@ -62,9 +76,36 @@ public class ProductDetailActivity extends AppCompatActivity {
             quantity = c.getInt(c.getColumnIndex(ProductContract.ProductEntry.COULMN_QUANTITY));
             tquantity.setText(String.valueOf(quantity));
             iUri = c.getString(c.getColumnIndex(ProductContract.ProductEntry.COULMN_IMAGE));
-            imageView.setImageURI(Uri.parse(iUri));
+            imageView.setImageBitmap(getBitmapFromUri(Uri.parse(iUri)));
+
+//            imageView.setImageURI(Uri.parse(iUri));
         }
     }
+
+    private Bitmap getBitmapFromUri(Uri selectedImage) {
+            ParcelFileDescriptor parcelFileDescriptor = null;
+            try {
+                parcelFileDescriptor =
+                        getContentResolver().openFileDescriptor(selectedImage, "r");
+                FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+                Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+                parcelFileDescriptor.close();
+                return image;
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to load image.", e);
+                return null;
+            } finally {
+                try {
+                    if (parcelFileDescriptor != null) {
+                        parcelFileDescriptor.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "Error closing ParcelFile Descriptor");
+                }
+            }
+    }
+
     @Override
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -102,6 +143,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
     public void increase(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("increase quantity");
@@ -157,9 +199,8 @@ public class ProductDetailActivity extends AppCompatActivity {
                     if (newValue < 0) {
                         Toast.makeText(ProductDetailActivity.this, "QUANTITY MUSTN'T LESS THAN 0", Toast.LENGTH_SHORT).show();
                         return;
-                    }
-                    else {
-                        quantity=newValue;
+                    } else {
+                        quantity = newValue;
                     }
                     ContentValues values = new ContentValues();
                     values.put(ProductContract.ProductEntry.COULMN_NAME, name);
@@ -185,9 +226,8 @@ public class ProductDetailActivity extends AppCompatActivity {
         });
 
         builder.show();
-
-
     }
+
     public void order(View view) {
         Intent intent = new Intent(Intent.ACTION_SENDTO);
         intent.setData(Uri.parse("mailto:"));

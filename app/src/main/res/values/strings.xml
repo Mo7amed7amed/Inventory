@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">Inventory</string>
+    <string name="product_name">Product Name :</string>
+    <string name="enter_name">Enter Name</string>
+    <string name="product_price">Product Price:</string>
+    <string name="enter_price">Enter Price</string>
+    <string name="product_quantity">Product Quantity :</string>
+    <string name="enter_quantity">Enter Quantity</string>
+    <string name="choose_an_image">Choose an Image</string>
+    <string name="save">Save</string>
+    <string name="there_is_no_products_to_show">There is No Products to show</string>
+    <string name="product_price_add">Product price :</string>
+    <string name="product_image">Product image :</string>
+    <string name="increase">Increase</string>
+    <string name="decrease">Decrease</string>
+    <string name="order">Order</string>
+    <string name="sale">Sale Product</string>
+    <string name="list_product_quantity_title">Quantity :</string>
+    <string name="product_price_title">Price :</string>
+    <string name="empty_view_subtitle_text">Your Inventory is Empty</string>
 </resources>
