@@ -6,15 +6,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.ParcelFileDescriptor;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,16 +19,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.FileDescriptor;
-import java.io.IOException;
-
 public class ProductDetailActivity extends AppCompatActivity {
     private Uri uri;
     private String name;
     private int price;
     private int quantity;
     private String iUri;
-    private static final String TAG = "ProductDetails";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +44,6 @@ public class ProductDetailActivity extends AppCompatActivity {
                     show(uri);
 
                 } else {
-
 
                     Toast.makeText(ProductDetailActivity.this, "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
                 }
@@ -76,34 +67,8 @@ public class ProductDetailActivity extends AppCompatActivity {
             quantity = c.getInt(c.getColumnIndex(ProductContract.ProductEntry.COULMN_QUANTITY));
             tquantity.setText(String.valueOf(quantity));
             iUri = c.getString(c.getColumnIndex(ProductContract.ProductEntry.COULMN_IMAGE));
-            imageView.setImageBitmap(getBitmapFromUri(Uri.parse(iUri)));
-
-//            imageView.setImageURI(Uri.parse(iUri));
+            imageView.setImageURI(Uri.parse(iUri));
         }
-    }
-
-    private Bitmap getBitmapFromUri(Uri selectedImage) {
-            ParcelFileDescriptor parcelFileDescriptor = null;
-            try {
-                parcelFileDescriptor =
-                        getContentResolver().openFileDescriptor(selectedImage, "r");
-                FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
-                Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
-                parcelFileDescriptor.close();
-                return image;
-            } catch (Exception e) {
-                Log.e(TAG, "Failed to load image.", e);
-                return null;
-            } finally {
-                try {
-                    if (parcelFileDescriptor != null) {
-                        parcelFileDescriptor.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Log.e(TAG, "Error closing ParcelFile Descriptor");
-                }
-            }
     }
 
     @Override

@@ -2,22 +2,17 @@ package com.example.mohamed.inventory;
 
 import android.content.ContentValues;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.IOException;
+import java.io.File;
 
 public class AddProductActivity extends AppCompatActivity {
     private Uri imageUri;
@@ -62,60 +57,42 @@ public class AddProductActivity extends AppCompatActivity {
     }
 
     public void takePhoto(View view) {
-        Intent intent = null;
-        if (Build.VERSION.SDK_INT < 19){
-         intent = new Intent(
-                Intent.ACTION_GET_CONTENT,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);}
-                else{
-            intent = new Intent( Intent.ACTION_GET_CONTENT,
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-        }
-        checkWriteToExternalPerms();
+
+        Intent intent = new Intent(
+                Intent.ACTION_GET_CONTENT, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
         Intent chooserIntent = Intent.createChooser(intent, "Select an Image");
         startActivityForResult(chooserIntent, 1);
     }
-    private void checkWriteToExternalPerms() {
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.READ_EXTERNAL_STORAGE},
-                        1);
-            } else {
-            }
-        } else {
-        }
-    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == RESULT_OK && null != data) {
-            Uri selectedImage = data.getData();
-            imageUri = selectedImage;
-            String[] projection = {MediaStore.Images.Media.DATA};
-
-            Cursor cursor = getContentResolver().query(selectedImage, projection, null, null, null);
-            assert cursor != null;
-            cursor.moveToFirst();
-
-            cursor.close();
-
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
-
-                ImageView imageView = (ImageView) findViewById(R.id.edit_image);
-                imageView.setImageBitmap(bitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-//            ImageView imageView = (ImageView) findViewById(R.id.edit_image);
+            Uri uriFromPath = data.getData();
+//            String realPath;
 //
-//            imageView.setImageURI(selectedImage);
+//            // SDK < API11
+//            if (Build.VERSION.SDK_INT < 11)
+//                realPath = RealPathUtil.getRealPathFromURI_BelowAPI11(this, data.getData());
+//
+//                // SDK >= 11 && SDK < 19
+//            else if (Build.VERSION.SDK_INT < 19)
+//                realPath = RealPathUtil.getRealPathFromURI_API11to18(this, data.getData());
+//
+//                // SDK > 19 (Android 4.4)
+//
+//             else   realPath = RealPathUtil.getRealPathFromURI_API19(this, data.getData());
+//            Uri uriFromPath = Uri.fromFile(new File(realPath));
+
+            imageUri = uriFromPath;
+
+            ImageView imageView = (ImageView) findViewById(R.id.edit_image);
+
+            imageView.setImageURI(uriFromPath);
 
         }
     }
+
 }
+
