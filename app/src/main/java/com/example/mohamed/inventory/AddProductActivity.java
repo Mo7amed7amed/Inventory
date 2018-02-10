@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
@@ -69,22 +68,21 @@ public class AddProductActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == RESULT_OK && null != data) {
-            Uri uriFromPath = data.getData();
-//            String realPath;
-//
-//            // SDK < API11
-//            if (Build.VERSION.SDK_INT < 11)
-//                realPath = RealPathUtil.getRealPathFromURI_BelowAPI11(this, data.getData());
-//
-//                // SDK >= 11 && SDK < 19
-//            else if (Build.VERSION.SDK_INT < 19)
-//                realPath = RealPathUtil.getRealPathFromURI_API11to18(this, data.getData());
-//
-//                // SDK > 19 (Android 4.4)
-//
-//             else   realPath = RealPathUtil.getRealPathFromURI_API19(this, data.getData());
-//            Uri uriFromPath = Uri.fromFile(new File(realPath));
+            String realPath;
+            // SDK < API11
+            if (Build.VERSION.SDK_INT < 11) {
+                realPath = RealPathUtil.getRealPathFromURI_BelowAPI11(this, data.getData());
+            }
+            // SDK >= 11 && SDK < 19
+            else if (Build.VERSION.SDK_INT < 19) {
+                realPath = RealPathUtil.getRealPathFromURI_API11to18(this, data.getData());
+            }
+            // SDK > 19 (Android 4.4) and up
+            else {
+                realPath = RealPathUtil.getRealPathFromURI_API19(this, data.getData());
+            }
 
+            Uri uriFromPath = Uri.fromFile(new File(realPath));
             imageUri = uriFromPath;
 
             ImageView imageView = (ImageView) findViewById(R.id.edit_image);
@@ -93,6 +91,5 @@ public class AddProductActivity extends AppCompatActivity {
 
         }
     }
-
 }
 
